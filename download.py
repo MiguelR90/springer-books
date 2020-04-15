@@ -1,6 +1,7 @@
 import argparse
 import os
 from collections import namedtuple
+from pathlib import Path
 from urllib.parse import urljoin
 
 import pandas as pd
@@ -25,14 +26,14 @@ def pdf_url(isbn):
 
 
 def get_books():
-    fp = "books.xlsx"
+    fp = Path("books.xlsx")
 
-    if os.path.isfile(fp):
+    if fp.is_file():
         return pd.read_excel(fp)
     else:
         r = requests.get(books_url)
 
-        with open(fp, "wb") as f:
+        with fp.open("wb") as f:
             f.write(r.content)
 
         return pd.read_excel(r.content)
@@ -40,14 +41,14 @@ def get_books():
 
 def download(book):
 
-    fp = f"books/{book.title}_{book.isbn}.pdf"
+    fp = Path("books").joinpath(f"{book.title}_{book.isbn}.pdf".replace("/", "_"))
 
-    if os.path.isfile(fp):
+    if fp.is_file():
         return
 
     r = requests.get(pdf_url(book.isbn))
 
-    with open(fp, "wb") as f:
+    with fp.open("wb") as f:
         f.write(r.content)
 
 
